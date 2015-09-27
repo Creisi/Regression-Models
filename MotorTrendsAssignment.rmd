@@ -1,0 +1,66 @@
+---
+title: "Transmission Type vs Fuel Efficiency"
+author: "by Rajesh Sankar"
+output:
+  pdf_document:
+    fig_height: 7
+    fig_width: 7
+---
+
+## Executive Summary  
+In this article, we will look at the effect of automatic vs manual transmission on fuel efficiency. To examine, we use a dataset for 32 automobiles (all 1973 - 1974 models) which includes a wide range of data comprising of mpg, number of cylinders, horse power etc. 
+
+## Exploratory Data Analysis  
+
+### Data Set
+First, we look at the data set. This data set was extracted from the 1974 edition of Motor Trend magazine. It consists of 32 cars on following 11 different variables:
+
+- Miles per US gallon
+- Number of cylinders
+- Displacement (cubic inches)
+- Horsepower
+- Rear axle ratio
+- Weight (lb / 1000)
+- 1/4 mile time
+- V/S
+- Transmission (automatic, manual)
+- Number of Gears
+- Number of carburetors
+
+The exploratory analysis is described in **Appendix** section for the plots. The box plot shows hat on average there is a difference between fuel efficiency depending on the transmission type. The manual transmission yields higher MPG than the automatic transmission. The Diagnostic plots show Toyota Corolla and Fiat 128 have a very high fuel efficiency, while Chrysler Imperial has a low fuel efficiency. Toyota Corona has a medium fuel efficiency. The pair graph shows some higher correlations between Weight, Displacement, number of Cylinders and Horsepower variables.
+
+## Regression Model
+Stepwise model selection using backwards elimination was performed to determine the variables for the best model.
+```{r}
+full.model <- lm(mpg ~ ., data = mtcars)
+best.model <- step(full.model, direction = "backward")
+```
+
+### Summary
+```{r}
+summary(best.model)
+```
+
+### Result
+Thus, this regression model  shows the best model includes cyl6, cyl8, hp, wt, and amManual variables. The adjusted R-squared indicates that about 84% of the variance is explained by the final model. The MPG decreases with higher number of cylinders, horsepower and weight. MPG increases with manual transmission.
+
+## Appendix: Graphs
+
+### Boxplot: Transmission vs MPG
+```{r, fig.width=5, fig.height=5}
+boxplot(mpg ~ am, data=mtcars, xlab="Transmission", ylab="MPG", col=terrain.colors(3))
+title(main = "Transmission vs MPG")
+legend("topleft", inset=.03, c("automatic", "manual"), fill=terrain.colors(3),horiz=TRUE)
+```
+
+### Pair Graph
+```{r}
+pairs(mtcars, panel=panel.smooth, main="Pair Graph")
+``` 
+
+### Residual Plots
+```{r}
+par(mfrow = c(2, 2))
+plot(lm(mpg ~ wt + qsec + am + wt:am, data=mtcars))
+```
+
